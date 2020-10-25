@@ -1,0 +1,144 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+        button {
+            background: black;
+            color: white;
+        }
+        .outer {
+            width: 100px;
+            position: relative;
+            display: inline-block;
+        }
+        .imagesize {
+            width: 100px;
+            border: 2px solid black;
+        }
+        .overlay {
+            position: absolute;
+            z-index: 2;
+        }
+        #col-1, #col-2, #col-3 {
+            display: inline-block;
+            margin: 0 10px;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <button onclick=randomize()>Start Again</button>
+    </div>
+    <div class="display">
+        <div id="col-1"></div>
+        <div id="col-2"></div>
+        <div id="col-3"></div>
+    </div>
+    
+</body>
+<script>
+    let numbers = ["https://i.ibb.co/1bPyBNx/1-blue.jpg",
+                "https://i.ibb.co/5k4cDYm/1-green.jpg",
+                "https://i.ibb.co/ZGJDKmt/1-red.jpg",
+                "https://i.ibb.co/S5bRz8n/2-blue.jpg",
+                "https://i.ibb.co/gm12HXN/2-green.jpg",
+                "https://i.ibb.co/VWnvwqM/2-red.jpg",
+                "https://i.ibb.co/ssCTJkr/3-blue.jpg",
+                "https://i.ibb.co/5hGS3bx/3-green.jpg",
+                "https://i.ibb.co/cwwg3X4/3-red.jpg",
+                "https://i.ibb.co/3W5YvMg/4-blue.jpg",
+                "https://i.ibb.co/W0mTkdc/4-green.jpg",
+                "https://i.ibb.co/1Kphcg9/4-red.jpg"];
+
+    let tempNumbers = [...numbers];
+    let shuffledNumbers = [];
+    let arr = [[],[],[]];
+    let dragImageIndex = -1;
+    let blank = "https://i.ibb.co/7V82p6m/Blank.jpg";
+
+    function allowDrop(ev){
+        ev.preventDefault();
+    }
+    function drag(ev, dragIndex){
+        dragImageIndex = dragIndex;
+    }
+    function drop(ev, dropIndex){
+        ev.preventDefault();
+        arr[dropIndex].push(arr[dragImageIndex][arr[dragImageIndex].length-1]);
+        arr[dragImageIndex].pop();
+        dragImageIndex = -1;
+        show();
+    }
+
+    function randomize(){
+        arr = [[],[],[]];
+        tempNumbers = [...numbers];
+        shuffledNumbers = [];
+        arr1 = [];
+        arr2 = [];
+        arr3 = [];
+        while(tempNumbers.length !== 0){
+            let index = Math.trunc(Math.random() * tempNumbers.length);
+            shuffledNumbers.push(tempNumbers[index]);
+            tempNumbers.splice(index,1);
+        }
+        for(let i=0; i<shuffledNumbers.length; i++){
+            if(i<4) arr[0].push(shuffledNumbers[i]);
+            else if(i>=4 && i<8) arr[1].push(shuffledNumbers[i]);
+            else arr[2].push(shuffledNumbers[i]);
+        }
+        show();
+    }
+
+    function setIndex(){
+        for(let i=0; i<3; i++){
+            let j = arr[i].length-1;
+            if(j>-1){
+                let ele = document.getElementById(""+i+j)
+                ele.setAttribute('draggable','true');
+                ele.setAttribute('ondragstart','drag(event,'+i+')');
+                ele.setAttribute('ondrop','drop(event,'+i+')');
+                ele.setAttribute('ondragover','allowDrop(event)');
+            }
+        }
+    }
+
+    function show(){
+        let str1 = "<div class='outer'>";
+        if(arr[0].length === 0){
+            arr[0].push(blank);
+        }
+        if(arr[1].length === 0){
+            arr[1].push(blank);
+        }
+        if(arr[2].length === 0){
+            arr[2].push(blank);
+        }
+        for(let i=0; i<arr[0].length; i++){
+            let styles = "top:"+i*30+"px";
+            str1 += "<img class='imagesize overlay' id='0"+i+"' src='"+arr[0][i]+"' style="+styles+">";
+        }
+        str1 += "</div>";
+        let str2 = "<div class='outer'>";
+        for(let i=0; i<arr[1].length; i++){
+            let styles = "top:"+i*30+"px";
+            str2 += "<img class='imagesize overlay' id='1"+i+"' src='"+arr[1][i]+"' style="+styles+">";
+        }
+        str2 += "</div>";
+        let str3 = "<div class='outer'>";
+        for(let i=0; i<arr[2].length; i++){
+            let styles = "top:"+i*30+"px";
+            str3 += "<img class='imagesize overlay' id='2"+i+"' src='"+arr[2][i]+"' style="+styles+">";
+        }
+        str3 += "</div>";
+
+        document.querySelector('#col-1').innerHTML = str1;
+        document.querySelector('#col-2').innerHTML = str2;
+        document.querySelector('#col-3').innerHTML = str3;
+        setIndex();
+
+    }
+
+</script>
+</html>
